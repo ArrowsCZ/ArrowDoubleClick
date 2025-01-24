@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+	<PropertyGroup>
+		<TargetFrameworks>Net48;Net80</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<LangVersion>preview</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<!--启用隐式命名空间引用-->
+		<ImplicitUsings>enable</ImplicitUsings>
+		<!--保存路径-->
+		<BaseOutputPath>D:\YQArch\sys\cz\MyDLL\ArrowTools\ArDoubleClick</BaseOutputPath>
+		<OutputPath>$(BaseOutputPath)\</OutputPath>
+		<!--<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>-->
+		<!--版本号迭代-->
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0</FileVersion>
+		<Deterministic>False</Deterministic>
+		<!--目标平台-->
+		<PlatformTarget>x64</PlatformTarget>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+		<Platforms>AnyCPU;x64</Platforms>
+		<!--使用单文件发布（Single File Publishing）-->
+		<!--<PublishSingleFile>true</PublishSingleFile>-->
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+		<DefineConstants>Debug;parallel</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<DefineConstants>RELEASE;parallel</DefineConstants>
+	</PropertyGroup>
+		
+	<ItemGroup Condition="'$(TargetFramework)' == 'Net48'">
+		<PackageReference Include="AutoCAD.NET" Version="20.0.0" ExcludeAssets="runtime" />		
+	</ItemGroup>
+	
+	<ItemGroup Condition="'$(TargetFramework)' == 'Net80'">
+		<PackageReference Include="AutoCAD.NET" Version="25.0.1" ExcludeAssets="runtime" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Compile Update="ResourceTools.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>ResourceTools.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="ResourceTools.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>ResourceTools.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+	
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Delete Files="$(TargetDir)$(TargetName).deps.json" />
+	</Target>
+</Project>

@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ArrowClick>
+  <!--双击开启/关闭设置(小写)：true(开启)，false(关闭)-->
+  <IsOn>true</IsOn>
+  <!--选择集空白命令设置：模型、布局、视口内！-->
+  <IsQuiescentCommand>
+    <Command>Line</Command>
+    <Command>Line</Command>
+    <Command>Line</Command>
+  </IsQuiescentCommand>
+  <!--选择集单个命令设置：类型(大写)、命令(大小写不限)！-->
+  <VoteCommand>
+    <!--线类-->
+    <Command Type="LINE">Circle</Command>
+    <Command Type="XLINE">Circle</Command>
+    <Command Type="LWPOLYLINE">Circle</Command>
+    <!--弧线类-->
+    <Command Type="ARC">Circle</Command>
+    <Command Type="CIRCLE">Circle</Command>
+    <Command Type="ELLIPSE">Circle</Command>
+    <!--注释类-->
+    <Command Type="HATCH">Circle</Command>
+    <Command Type="TEXT">Circle</Command>
+    <Command Type="MTEXT">Circle</Command>
+    <Command Type="DIMENSION">Circle</Command>
+    <Command Type="LEADER">Circle</Command>
+    <Command Type="MULTILEADER">Circle</Command>
+    <!--其它-->
+    <Command Type="WIPEOUT">Circle</Command>
+    <Command Type="VIEWPORT">Circle</Command>
+    <!--块类-->
+    <Command Type="INSERT">Circle</Command>
+    <!--    <Command Type="INSERT">Circle</Command>-->
+  </VoteCommand>
+  <!--选择集多个命令设置：命令(大小写不限)！-->
+  <MultiSelectCmd>Arc</MultiSelectCmd>
+</ArrowClick>
