@@ -8,7 +8,7 @@ public class Init : IExtensionApplication
         const string notice =
             "版本支持:Auto CAD 2015-2025"
             + "\n"
-            + "\n使用注意：2020-2025版本初次开启文档不加载此功能，"
+            + "\n使用注意：初次开启文档不加载此功能，"
             + "\n需切換至其它文档后双击设置生效！";
         Acaop.ShowAlertDialog(notice);
 
