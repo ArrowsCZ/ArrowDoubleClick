@@ -16,6 +16,10 @@ public class Init : IExtensionApplication
         // Acaop.DocumentManager.DocumentCreated += DmClickStart; // 開啟文檔時，加載雙擊事件
         // Acaop.DocumentManager.DocumentDestroyed += DmClickEnd; // 關閉文檔時，移除雙擊事件
         Acaop.DocumentManager.DocumentActivated += DmClickActivated; // 切換文檔時，加載雙擊事件
+
+        // 幫我寫一個切換至其它文檔的功能
+        // 此處錯誤，使用LISP加載dll:INIT初始化時，無法往DocumentManager中添加文檔
+        // var currentDocument = Acaop.DocumentManager.MdiActiveDocument;
     }
 
     private static void DmClickActivated(object sender, DocumentCollectionEventArgs e)
