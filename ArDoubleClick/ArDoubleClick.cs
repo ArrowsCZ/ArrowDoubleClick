@@ -7,13 +7,13 @@ public static class ArDoubleClick
     // todo:2025-01-22  使用類結構及xml反序列化重構代碼
     static ArDoubleClick()
     {
-        if (!Directory.Exists(Path.GetDirectoryName(SettingsFilePath)))
-            Directory.CreateDirectory(Path.GetDirectoryName(SettingsFilePath)!); // 在指定的路径下创建一个新的文件夹。
-        if (!File.Exists(SettingsFilePath))
+        if (!Directory.Exists(Path.GetDirectoryName(SettingsFile)))
+            Directory.CreateDirectory(Path.GetDirectoryName(SettingsFile)!); // 在指定的路径下创建一个新的文件夹。
+        if (!File.Exists(SettingsFile))
         {
-            File.WriteAllBytes(SettingsFilePath, ResourceTools.ClickSettings); // 在指定的路径下写入一个新的配置。
+            File.WriteAllBytes(SettingsFile, ResourceTools.ClickSettings); // 在指定的路径下写入一个新的配置。
 #if Debug
-            Acaop.ShowAlertDialog($"配置文件缺失，已从资源中写入文件:{SettingsFilePath}！");
+            Acaop.ShowAlertDialog($"配置文件缺失，已从资源中写入文件:{SettingsFile}！");
 #endif
         }
 
@@ -29,7 +29,7 @@ public static class ArDoubleClick
     /// </summary>
     private static void InitClick()
     {
-        XDocument doc = XDocument.Load(SettingsFilePath);
+        XDocument doc = XDocument.Load(SettingsFile);
 
         // 初始化 IsOn
         var isOnElement = doc.Root?.Element("IsOn");
@@ -68,7 +68,7 @@ public static class ArDoubleClick
     /// <summary>
     /// 配置類文件路徑。
     /// </summary>
-    private static readonly string SettingsFilePath = Path.Combine(FilePath, "ClickSettings.xml");
+    private static readonly string SettingsFile = Path.Combine(FilePath, "ClickSettings.xml");
 
     /// <summary>
     /// 存储在不同情况下双击时要执行的命令。
@@ -96,8 +96,8 @@ public static class ArDoubleClick
     public static void ArS_Double_Click_Init()
     {
         // 更新 XML 文件中的 IsOn 值
-        if (!File.Exists(SettingsFilePath))
-            File.WriteAllBytes(SettingsFilePath, ResourceTools.ClickSettings); // 在指定的路径下写入一个新的配置。
+        if (!File.Exists(SettingsFile))
+            File.WriteAllBytes(SettingsFile, ResourceTools.ClickSettings); // 在指定的路径下写入一个新的配置。
 
         PromptKeywordOptions options = new(string.Empty);
         options.Keywords.Add("S", "S", "更新");
@@ -120,7 +120,7 @@ public static class ArDoubleClick
                 try
                 {
                     InitClick();
-                    Editor.WriteMessage("\n配置文件已更新：{FilePath}");
+                    Editor.WriteMessage($"\n配置文件已更新：{SettingsFile}");
                 }
                 catch (Exception ex)
                 {
@@ -138,13 +138,13 @@ public static class ArDoubleClick
         // 更新xml中 IsOn 值
         if (isOnTemp == _isOn)
             return;
-        XDocument doc = XDocument.Load(SettingsFilePath);
+        XDocument doc = XDocument.Load(SettingsFile);
         var isOnElement = doc.Root?.Element("IsOn");
         if (isOnElement != null)
             isOnElement.Value = _isOn.ToString().ToLower();
         else
             doc.Root?.Add(new XElement("IsOn", _isOn.ToString().ToLower()));
-        doc.Save(SettingsFilePath);
+        doc.Save(SettingsFile);
 
         Editor.WriteMessage($"\n双击设置已：{(_isOn ? "开启" : "关闭")}！");
     }
