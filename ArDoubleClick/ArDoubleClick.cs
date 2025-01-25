@@ -4,7 +4,6 @@ namespace ArrowTools;
 
 public static class ArDoubleClick
 {
-    // todo:2025-01-22  添加提示：cad2022中初次打開CAD無法正常運行，需要關閉dwg重新打開命令才會生效，2018中正常運行
     // todo:2025-01-22  使用類結構及xml反序列化重構代碼
     static ArDoubleClick()
     {
@@ -38,9 +37,7 @@ public static class ArDoubleClick
             _isOn = isOn;
 
         // 初始化 IsQuiescentCommand
-        var isQuiescentCommandElements = doc
-            .Root?.Element("IsQuiescentCommand")
-            ?.Elements("Command");
+        var isQuiescentCommandElements = doc.Root?.Element("IsQuiescentCommand")?.Elements("Command");
         if (isQuiescentCommandElements != null)
             _isQuiescentCommand = [.. isQuiescentCommandElements.Select(element => element.Value)];
 
@@ -87,8 +84,7 @@ public static class ArDoubleClick
     /// </summary>
     private static Dictionary<string, string> _voteCommand = [];
 
-    private static readonly Dictionary<string, string> CmdClassMap =
-        new() { { "VPMAX", "VIEWPORT" } };
+    private static readonly Dictionary<string, string> CmdClassMap = new() { { "VPMAX", "VIEWPORT" } };
     private static string _multiSelectCmd = string.Empty; // 多選發送的命令
 
     private static bool _isOn = true; // 是否開啟雙擊
@@ -110,8 +106,7 @@ public static class ArDoubleClick
         options.Keywords.Add("N", "N", "关闭");
         options.Keywords.Default = _isOn ? "Y" : "N";
         options.AppendKeywordsToMessage = false; //不将关键字列表添加到提示信息中
-        options.Message =
-            $"\n配置更新或双击设置：" + $"\n[更新(S)/开启(Y)/关闭(N)]<{(_isOn ? "Y" : "N")}>";
+        options.Message = $"\n配置更新或双击设置：" + $"\n[更新(S)/开启(Y)/关闭(N)]<{(_isOn ? "Y" : "N")}>";
         PromptResult pr = Editor.GetKeywords(options);
         if (pr.Status != PromptStatus.OK)
         {
@@ -189,9 +184,7 @@ public static class ArDoubleClick
         if (_isCurrent > docCount)
             _isCurrent = docCount;
 #if Debug
-        Editor.WriteMessage(
-            $"\n命令執行次數：★ {_isCurrent} ★ 无活动命令或选择集：{Editor.IsQuiescent}"
-        ); // 无活动命令或选择集
+        Editor.WriteMessage($"\n命令執行次數：★ {_isCurrent} ★ 无活动命令或选择集：{Editor.IsQuiescent}"); // 无活动命令或选择集
 #endif
         if (Editor.IsQuiescent) // 判斷是否處於選中ent的狀態
         {
@@ -312,12 +305,7 @@ public static class ArDoubleClick
         if (Database.TileMode)
         {
             if (!string.IsNullOrWhiteSpace(_isQuiescentCommand[0]))
-                Document.SendStringToExecute(
-                    $"\u0003_{_isQuiescentCommand[0]} ",
-                    true,
-                    false,
-                    false
-                );
+                Document.SendStringToExecute($"\u0003_{_isQuiescentCommand[0]} ", true, false, false);
         }
         else
         {
