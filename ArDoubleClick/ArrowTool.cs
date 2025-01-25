@@ -24,10 +24,8 @@ public static class ArrowTool
 
         assemblyPath = Path.GetDirectoryName(assemblyPath); // 这里是\\
         if (assemblyPath == null)
-            throw new Exception("获取路径失败！");
-        var it = assemblyPath.LastIndexOf('\\');
-        if (it != -1)
-            assemblyPath = $"{assemblyPath.Substring(0, assemblyPath.LastIndexOf('\\'))}\\"; // 返回上一级目录
+            throw new Exception("获取路径失败");
+
         return assemblyPath;
     }
 }

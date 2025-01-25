@@ -20,6 +20,8 @@ public class Init : IExtensionApplication
         // 幫我寫一個切換至其它文檔的功能
         // 此處錯誤，使用LISP加載dll:INIT初始化時，無法往DocumentManager中添加文檔
         // var currentDocument = Acaop.DocumentManager.MdiActiveDocument;
+
+        AutoReg.RegApp();
     }
 
     private static void DmClickActivated(object sender, DocumentCollectionEventArgs e)
