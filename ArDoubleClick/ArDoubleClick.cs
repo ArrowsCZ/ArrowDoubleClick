@@ -62,8 +62,7 @@ public static class ArDoubleClick
     }
 
     // todo:2025-01-16  如果雙擊時是多選對象，那麼邏輯如何重新構建
-    private static string FilePath =>
-        Path.GetDirectoryName(Path.GetDirectoryName(GetAssemblyPath(true))) ?? string.Empty;
+    private static string FilePath => Path.GetDirectoryName(Path.GetDirectoryName(GetAssemblyFullPath())) ?? string.Empty;
 
     /// <summary>
     /// 配置類文件路徑。
