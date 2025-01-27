@@ -67,4 +67,22 @@ public static class ArrowTool
 
         return poly;
     }
+
+    public static Polyline ToPolyline(this Extents3d geoEx)
+    {
+        var pts = new List<Point2d>()
+        {
+            new(geoEx.MinPoint.X, geoEx.MinPoint.Y),
+            new(geoEx.MinPoint.X, geoEx.MaxPoint.Y),
+            new(geoEx.MaxPoint.X, geoEx.MaxPoint.Y),
+            new(geoEx.MaxPoint.X, geoEx.MinPoint.Y),
+        };
+        Polyline pline = new();
+        pline.AddVertexAt(0, pts[0], 0, 0, 0);
+        pline.AddVertexAt(1, pts[1], 0, 0, 0);
+        pline.AddVertexAt(2, pts[2], 0, 0, 0);
+        pline.AddVertexAt(3, pts[3], 0, 0, 0);
+        pline.Closed = true;
+        return pline;
+    }
 }

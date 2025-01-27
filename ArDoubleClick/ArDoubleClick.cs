@@ -208,7 +208,7 @@ public static class ArDoubleClick
     /// <param name="e"></param>
     private static void Dm_VetoCommand(object sender, DocumentLockModeChangedEventArgs e)
     {
-        // Bug修復：2025-01-27  佈局切換至視口空間時，否決命令事件不觸發
+        // Bug修復：2025-01-27  佈局切換至視口空間時雙擊，否決命令事件不觸發
         if (e.GlobalCommandName.Equals(_isQuiescentCommand[1], StringComparison.CurrentCultureIgnoreCase) && _isPsClick)
         {
             e.Veto();
@@ -334,13 +334,7 @@ public static class ArDoubleClick
                 ];
                 SelectionFilter filter = new(values);
                 var psr = Editor.SelectAll(filter);
-                if (psr.Status != PromptStatus.OK || psr.Value.Count == 1)
-                {
-                    var cmd = _isQuiescentCommand[2];
-                    if (!string.IsNullOrWhiteSpace(cmd))
-                        Document.SendStringToExecute($"\u0003_{cmd} ", true, false, false);
-                }
-                else
+                if (psr.Status == PromptStatus.OK && psr.Value.Count != 1)
                 {
                     List<Polyline> curves = [];
                     foreach (var id in psr.Value.GetObjectIds())
@@ -372,33 +366,22 @@ public static class ArDoubleClick
                         else // 矩形視口
                         {
                             var geoEx = vp.GeometricExtents;
-                            var pts = new List<Point2d>()
-                            {
-                                new(geoEx.MinPoint.X, geoEx.MinPoint.Y),
-                                new(geoEx.MinPoint.X, geoEx.MaxPoint.Y),
-                                new(geoEx.MaxPoint.X, geoEx.MaxPoint.Y),
-                                new(geoEx.MaxPoint.X, geoEx.MinPoint.Y),
-                            };
-                            using Polyline pline = new();
-                            pline.AddVertexAt(0, pts[0], 0, 0, 0);
-                            pline.AddVertexAt(1, pts[1], 0, 0, 0);
-                            pline.AddVertexAt(2, pts[2], 0, 0, 0);
-                            pline.AddVertexAt(3, pts[3], 0, 0, 0);
-                            pline.Closed = true;
+                            using Polyline pline = geoEx.ToPolyline();
                             addBoundary = (Polyline)pline.Clone();
                         }
                         curves.Add(addBoundary);
                     }
-                    foreach (var unused in curves.Where(curve => mpt.IsPointInside(curve)))
-                        _isPsClick = true;
+
+                    foreach (var curve in curves)
+                        if (mpt.IsPointInside(curve))
+                            _isPsClick = true;
                 }
             }
-            else
-            {
-                var cmd = _isQuiescentCommand[2];
-                if (!string.IsNullOrWhiteSpace(cmd))
-                    Document.SendStringToExecute($"\u0003_{cmd} ", true, false, false);
-            }
+            tr.Commit();
+
+            var cmd = vpActive.Number == 1 ? _isQuiescentCommand[1] : _isQuiescentCommand[2];
+            if (!string.IsNullOrWhiteSpace(cmd))
+                Document.SendStringToExecute($"\u0003_{cmd} ", true, false, false);
         }
 
         _isCurrent = int.MaxValue; // 重置
