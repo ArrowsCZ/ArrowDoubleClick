@@ -89,7 +89,6 @@ public static class ArDoubleClick
 
     private static bool _isOn = true; // 是否開啟雙擊
     private static bool _isClick; // 是否是雙擊操作
-    private static bool _isPsClick; // 是否是雙擊操作
 
     // 2025-01-23  Bug修復：打開多個文檔時，雙擊多次觸發雙擊事件，導致命令重複執行
     private static int _isCurrent = int.MaxValue; // 是否是当前文档
@@ -208,14 +207,6 @@ public static class ArDoubleClick
     /// <param name="e"></param>
     private static void Dm_VetoCommand(object sender, DocumentLockModeChangedEventArgs e)
     {
-        // Bug修復：2025-01-27  佈局切換至視口空間時雙擊，否決命令事件不觸發
-        if (e.GlobalCommandName.Equals(_isQuiescentCommand[1], StringComparison.CurrentCultureIgnoreCase) && _isPsClick)
-        {
-            e.Veto();
-            _isPsClick = false;
-            return;
-        }
-
         if (!_isClick || !_isOn)
             return;
 
@@ -310,6 +301,8 @@ public static class ArDoubleClick
     /// </summary>
     private static void DoubleClickIsQuiescent()
     {
+        // Bug修復：2025-01-27  佈局切換至視口空間時雙擊，否決命令事件不觸發
+        bool isMsClick = false; // 鼠標位置是否在視口內
         using Transaction tr = Database.TransactionManager.StartTransaction();
         if (Database.TileMode)
         {
@@ -327,6 +320,7 @@ public static class ArDoubleClick
                 Editor.WriteMessage($"\n鼠標位置：{mpt}");
                 Editor.WriteMessage($"\n空間名稱：{LayoutManager.Current.CurrentLayout}");
 #endif
+                // 通過過濾器選擇排除佈局的所有視口
                 TypedValue[] values =
                 [
                     new((int)DxfCode.LayoutName, LayoutManager.Current.CurrentLayout),
@@ -336,7 +330,7 @@ public static class ArDoubleClick
                 var psr = Editor.SelectAll(filter);
                 if (psr.Status == PromptStatus.OK && psr.Value.Count != 1)
                 {
-                    List<Polyline> curves = [];
+                    List<Polyline> plines = [];
                     foreach (var id in psr.Value.GetObjectIds())
                     {
                         var vp = (Viewport)tr.GetObject(id, OpenMode.ForRead);
@@ -344,8 +338,9 @@ public static class ArDoubleClick
                             continue;
 
                         // 添加視口邊界框
+                        // 判斷是否是非矩形視口
                         Polyline addBoundary;
-                        if (vp.NonRectClipOn) // 非矩形視口
+                        if (vp.NonRectClipOn) 
                         {
                             var boundary = tr.GetObject(vp.NonRectClipEntityId, OpenMode.ForRead);
                             switch (boundary)
@@ -363,24 +358,26 @@ public static class ArDoubleClick
                                     continue;
                             }
                         }
-                        else // 矩形視口
+                        else 
                         {
                             var geoEx = vp.GeometricExtents;
                             using Polyline pline = geoEx.ToPolyline();
                             addBoundary = (Polyline)pline.Clone();
                         }
-                        curves.Add(addBoundary);
+                        plines.Add(addBoundary);
                     }
 
-                    foreach (var curve in curves)
-                        if (mpt.IsPointInside(curve))
-                            _isPsClick = true;
+                    // 查找鼠標位置是否在視口內
+                    var plineInside = plines.FirstOrDefault(pl => mpt.IsPointInside(pl));
+                    if (plineInside != null)
+                        isMsClick = true;
                 }
             }
             tr.Commit();
 
+            // 發送相應的命令
             var cmd = vpActive.Number == 1 ? _isQuiescentCommand[1] : _isQuiescentCommand[2];
-            if (!string.IsNullOrWhiteSpace(cmd))
+            if (!isMsClick && !string.IsNullOrWhiteSpace(cmd))
                 Document.SendStringToExecute($"\u0003_{cmd} ", true, false, false);
         }
 
