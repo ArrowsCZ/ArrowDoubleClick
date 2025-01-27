@@ -1,4 +1,5 @@
 ﻿using System.Xml.Linq;
+using Autodesk.AutoCAD.Geometry;
 
 namespace ArrowTools;
 
@@ -62,7 +63,8 @@ public static class ArDoubleClick
     }
 
     // todo:2025-01-16  如果雙擊時是多選對象，那麼邏輯如何重新構建
-    private static string FilePath => Path.GetDirectoryName(Path.GetDirectoryName(GetAssemblyFullPath())) ?? string.Empty;
+    private static string FilePath =>
+        Path.GetDirectoryName(Path.GetDirectoryName(GetAssemblyFullPath())) ?? string.Empty;
 
     /// <summary>
     /// 配置類文件路徑。
@@ -87,6 +89,7 @@ public static class ArDoubleClick
 
     private static bool _isOn = true; // 是否開啟雙擊
     private static bool _isClick; // 是否是雙擊操作
+    private static bool _isPsClick; // 是否是雙擊操作
 
     // 2025-01-23  Bug修復：打開多個文檔時，雙擊多次觸發雙擊事件，導致命令重複執行
     private static int _isCurrent = int.MaxValue; // 是否是当前文档
@@ -205,6 +208,14 @@ public static class ArDoubleClick
     /// <param name="e"></param>
     private static void Dm_VetoCommand(object sender, DocumentLockModeChangedEventArgs e)
     {
+        // Bug修復：2025-01-27  佈局切換至視口空間時，否決命令事件不觸發
+        if (e.GlobalCommandName.Equals(_isQuiescentCommand[1], StringComparison.CurrentCultureIgnoreCase) && _isPsClick)
+        {
+            e.Veto();
+            _isPsClick = false;
+            return;
+        }
+
         if (!_isClick || !_isOn)
             return;
 
@@ -308,12 +319,88 @@ public static class ArDoubleClick
         else
         {
             var vpActive = (Viewport)tr.GetObject(Editor.ActiveViewportId, OpenMode.ForRead);
-            var cmd = vpActive.Number == 1 ? _isQuiescentCommand[1] : _isQuiescentCommand[2];
-            if (!string.IsNullOrWhiteSpace(cmd))
-                Document.SendStringToExecute($"\u0003_{cmd} ", true, false, false);
+            if (vpActive.Number == 1)
+            {
+                // 判斷當前鼠標位置是否在視口內
+                Point3d mpt = (Point3d)Acaop.GetSystemVariable("LASTPOINT");
+#if Debug
+                Editor.WriteMessage($"\n鼠標位置：{mpt}");
+                Editor.WriteMessage($"\n空間名稱：{LayoutManager.Current.CurrentLayout}");
+#endif
+                TypedValue[] values =
+                [
+                    new((int)DxfCode.LayoutName, LayoutManager.Current.CurrentLayout),
+                    new((int)DxfCode.Start, nameof(Viewport)),
+                ];
+                SelectionFilter filter = new(values);
+                var psr = Editor.SelectAll(filter);
+                if (psr.Status != PromptStatus.OK || psr.Value.Count == 1)
+                {
+                    var cmd = _isQuiescentCommand[2];
+                    if (!string.IsNullOrWhiteSpace(cmd))
+                        Document.SendStringToExecute($"\u0003_{cmd} ", true, false, false);
+                }
+                else
+                {
+                    List<Polyline> curves = [];
+                    foreach (var id in psr.Value.GetObjectIds())
+                    {
+                        var vp = (Viewport)tr.GetObject(id, OpenMode.ForRead);
+                        if (vp.Number == 1)
+                            continue;
+
+                        // 添加視口邊界框
+                        Polyline addBoundary;
+                        if (vp.NonRectClipOn) // 非矩形視口
+                        {
+                            var boundary = tr.GetObject(vp.NonRectClipEntityId, OpenMode.ForRead);
+                            switch (boundary)
+                            {
+                                case Polyline pline:
+                                    addBoundary = pline;
+                                    break;
+                                case Circle circle:
+                                {
+                                    using Polyline pl = circle.ToPolyline();
+                                    addBoundary = (Polyline)pl.Clone();
+                                    break;
+                                }
+                                default:
+                                    continue;
+                            }
+                        }
+                        else // 矩形視口
+                        {
+                            var geoEx = vp.GeometricExtents;
+                            var pts = new List<Point2d>()
+                            {
+                                new(geoEx.MinPoint.X, geoEx.MinPoint.Y),
+                                new(geoEx.MinPoint.X, geoEx.MaxPoint.Y),
+                                new(geoEx.MaxPoint.X, geoEx.MaxPoint.Y),
+                                new(geoEx.MaxPoint.X, geoEx.MinPoint.Y),
+                            };
+                            using Polyline pline = new();
+                            pline.AddVertexAt(0, pts[0], 0, 0, 0);
+                            pline.AddVertexAt(1, pts[1], 0, 0, 0);
+                            pline.AddVertexAt(2, pts[2], 0, 0, 0);
+                            pline.AddVertexAt(3, pts[3], 0, 0, 0);
+                            pline.Closed = true;
+                            addBoundary = (Polyline)pline.Clone();
+                        }
+                        curves.Add(addBoundary);
+                    }
+                    foreach (var unused in curves.Where(curve => mpt.IsPointInside(curve)))
+                        _isPsClick = true;
+                }
+            }
+            else
+            {
+                var cmd = _isQuiescentCommand[2];
+                if (!string.IsNullOrWhiteSpace(cmd))
+                    Document.SendStringToExecute($"\u0003_{cmd} ", true, false, false);
+            }
         }
 
         _isCurrent = int.MaxValue; // 重置
-        tr.Commit();
     }
 }
