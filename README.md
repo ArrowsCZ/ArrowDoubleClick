@@ -10,4 +10,5 @@ DoubleClick:鼠標雙擊設置！
 
 #### 使用說明
 
+鳴謝：註冊源碼來自開源SDK:InspireFunction/IFoxCAD!
 詳見：“Resources”文件夾下“ClickSettings.xml”文件內說明。
