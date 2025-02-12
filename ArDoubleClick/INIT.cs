@@ -35,22 +35,23 @@ public class Init : IExtensionApplication
 
         // Bug修復:2025-02-12  加载dll首个文档直接加载双击操作
         {
-            Acaop.DocumentManager.DocumentActivated += DmClickActivated; // 切換文檔時，加載雙擊事件
+            // 函數優化：雙擊事件設定為永駐事件，取消文檔激活時卸載再次加載雙擊事件。
+            // Acaop.DocumentManager.DocumentActivated += DmClickActivated; // 切換文檔時，加載雙擊事件
             ArDoubleClick.ArDoubleClickStart();
         }
     }
 
-    /// <summary>
-    /// 當前文檔被激活時觸發，結束並重新開始雙擊功能。
-    /// </summary>
-    private static void DmClickActivated(object sender, DocumentCollectionEventArgs e)
-    {
-#if Debug
-        Acaop.ShowAlertDialog("激活了當前！");
-#endif
-        ArDoubleClick.ArDoubleClickEnd();
-        ArDoubleClick.ArDoubleClickStart();
-    }
+//     /// <summary>
+//     /// 當前文檔被激活時觸發，結束並重新開始雙擊功能。
+//     /// </summary>
+//     private static void DmClickActivated(object sender, DocumentCollectionEventArgs e)
+//     {
+// #if Debug
+//         Acaop.ShowAlertDialog("激活了當前！");
+// #endif
+//         ArDoubleClick.ArDoubleClickEnd();
+//         ArDoubleClick.ArDoubleClickStart();
+//     }
 
     public void Terminate() { }
 }
