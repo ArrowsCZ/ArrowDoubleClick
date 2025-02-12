@@ -30,14 +30,7 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/620f6e7eba834c42a2f2db6b22950df6531838/01/ae383003/Object.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/C SHARP/ArrowToolsNew/Arrows/ArDoubleClick/ArDoubleClick/ArDoubleClick.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/C SHARP/ArrowToolsNew/Arrows/ArDoubleClick/ArDoubleClick/ArDoubleClick.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/C SHARP/ArrowToolsNew/Arrows/ArDoubleClick/ArDoubleClick/ArDoubleClick.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/C SHARP/ArrowToolsNew/Arrows/ArDoubleClick/ArDoubleClick/ArDoubleClick.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/C SHARP/ArrowToolsNew/Arrows/ArDoubleClick/ArDoubleClick/ArDoubleClick.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/C SHARP/ArrowToolsNew/Arrows/ArDoubleClick/ArDoubleClick/ArDoubleClick.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://F:/C SHARP/ArrowToolsNew/Arrows/ArDoubleClick/ArDoubleClick/ArDoubleClick.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://F:/CSharpN/ArDoubleClick/ArDoubleClick/ArDoubleClick.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -119,6 +112,8 @@
       <workItem from="1737971274241" duration="3847000" />
       <workItem from="1737980454810" duration="2081000" />
       <workItem from="1737984123705" duration="5824000" />
+      <workItem from="1739292111903" duration="724000" />
+      <workItem from="1739340770547" duration="2094000" />
     </task>
     <servers />
   </component>
@@ -132,7 +127,17 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ID_WIDTH">
+                <map>
+                  <entry key="Table.Default.Author.ColumnIdWidth" value="64" />
+                  <entry key="Table.Default.Date.ColumnIdWidth" value="56" />
+                  <entry key="Table.Default.Hash.ColumnIdWidth" value="71" />
+                  <entry key="Table.Git.CommitSignature.ColumnIdWidth" value="53" />
+                  <entry key="Table.GitHub.CommitStatus.ColumnIdWidth" value="54" />
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>

@@ -1,0 +1,41 @@
+[user]
+	name = Medithaibet
+	email = 12247633+medithaibet@user.noreply.gitee.com
+[credential "https://gitee.com"]
+	provider = generic
+[safe]
+	directory = F:/C SHARP/Example source(gitee)
+	directory = F:/C SHARP/ArrowToolsDynamic/Dynamic
+	directory = F:/C SHARP/ArrowToolsDynamic/testDynamic/for-simple-testing-purposes
+	directory = F:/C SHARP/ArrowToolsNew/ArrowTools/ArrowTools
+	directory = F:/C SHARP/ArrowToolsNew/IFoxCAD_9.0
+	directory = F:/C SHARP/ArrowToolsNew/IFoxCAD_9.0/ifoxcad
+	directory = F:/C SHARP/ArrowToolsNew/Arrows/arrow-tools
+	directory = F:/C SHARP/ArrowToolsNew/Arrows
+	directory = *
+[core]
+	autocrlf = true
+[alias]
+	ad = add .          #全部添加到缓冲区
+	cm = commit -m      #提交信息
+	cmxg = commit --amend  #修改cm信息注意是push前
+
+	st = status 		#查看当前修改了什么文件
+    br = branch         #分支
+	bra = branch -a     #查看本地和远程所有分支
+	brv = branch --v	#查看分支
+	sw = switch   		#切换分支
+
+	reall = remote -v   #查看项目远程地址
+
+	log1 = log --pretty=oneline
+
+	pushm = "!f() { git push gitee master && git push github master; }; f"			#push master
+	pushd = "!f() { git push gitee dev && git push github dev; }; f"				#push dev
+	pullm = "!f() { git pull gitee master && git pull github master; }; f"			#pull master
+	pulld = "!f() { git pull gitee dev && git pull github dev; }; f"				#pull dev
+
+	swc = switch -c   #分支创建并切换本地分支,git checkout -b "分支"
+	devmerge = "!f() { git merge gitee/dev && git merge github/dev; }; f"		#merge dev
+	devbdel = branch -d dev		   #删除本地分支
+	devrdel = "!f() { git push gitee --delete dev && git push github --delete dev; }; f"		 #删除远程分支

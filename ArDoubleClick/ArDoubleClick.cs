@@ -91,7 +91,7 @@ public static class ArDoubleClick
     private static bool _isClick; // 是否是雙擊操作
 
     // 2025-01-23  Bug修復：打開多個文檔時，雙擊多次觸發雙擊事件，導致命令重複執行
-    private static int _isCurrent = int.MaxValue; // 是否是当前文档
+    //private static int _isCurrent = int.MaxValue; // 是否是当前文档
 
     [CommandMethod(nameof(ArS_Double_Click_Init))]
     public static void ArS_Double_Click_Init()
@@ -179,24 +179,24 @@ public static class ArDoubleClick
         if (!_isOn)
             return;
 
-        // 打開幾個文檔，雙擊操作就會觸發幾次，所以需要限定為當前文檔時才執行，否則會多次執行
-        int docCount = Acaop.DocumentManager.Count;
-        if (_isCurrent > docCount)
-            _isCurrent = docCount;
+        // 更新加载方式，取消：打開幾個文檔，雙擊操作就會觸發幾次，所以需要限定為當前文檔時才執行，否則會多次執行
+        //int docCount = Acaop.DocumentManager.Count;
+        //if (_isCurrent > docCount)
+        //    _isCurrent = docCount;
 #if Debug
-        Editor.WriteMessage($"\n命令執行次數：★ {_isCurrent} ★ 无活动命令或选择集：{Editor.IsQuiescent}"); // 无活动命令或选择集
+        //Editor.WriteMessage($"\n命令執行次數：★ {_isCurrent} ★ 无活动命令或选择集：{Editor.IsQuiescent}"); // 无活动命令或选择集
 #endif
         if (Editor.IsQuiescent) // 判斷是否處於選中ent的狀態
         {
-            _isCurrent = int.MaxValue; // 重置
+            //_isCurrent = int.MaxValue; // 重置
             _isClick = true;
         }
         else
         {
-            if (_isCurrent == 1)
-                DoubleClickIsQuiescent(); // 静止状态
-            else
-                _isCurrent--;
+            //if (_isCurrent == 1)
+            DoubleClickIsQuiescent(); // 静止状态
+            //else
+            //_isCurrent--;
         }
     }
 
@@ -340,7 +340,7 @@ public static class ArDoubleClick
                         // 添加視口邊界框
                         // 判斷是否是非矩形視口
                         Polyline addBoundary;
-                        if (vp.NonRectClipOn) 
+                        if (vp.NonRectClipOn)
                         {
                             var boundary = tr.GetObject(vp.NonRectClipEntityId, OpenMode.ForRead);
                             switch (boundary)
@@ -358,7 +358,7 @@ public static class ArDoubleClick
                                     continue;
                             }
                         }
-                        else 
+                        else
                         {
                             var geoEx = vp.GeometricExtents;
                             using Polyline pline = geoEx.ToPolyline();
@@ -376,11 +376,11 @@ public static class ArDoubleClick
             tr.Commit();
 
             // 發送相應的命令
-            var cmd = vpActive.Number == 1 ? _isQuiescentCommand[1] : _isQuiescentCommand[2];
+            var cmd = (vpActive.Number == 1 ? _isQuiescentCommand[1] : _isQuiescentCommand[2]) + " ";
             if (!isMsClick && !string.IsNullOrWhiteSpace(cmd))
-                Document.SendStringToExecute($"\u0003_{cmd} ", true, false, false);
+                Document.SendStringToExecute(cmd, true, false, false);
         }
 
-        _isCurrent = int.MaxValue; // 重置
+        //_isCurrent = int.MaxValue; // 重置
     }
 }
