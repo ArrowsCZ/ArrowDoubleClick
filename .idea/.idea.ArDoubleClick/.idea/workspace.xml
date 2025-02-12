@@ -31,6 +31,7 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="mock://F:/CSharpN/ArDoubleClick/ArDoubleClick/ArDoubleClick.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://F:/CSharpN/ArDoubleClick/ArDoubleClick/ArDoubleClick.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -114,6 +115,8 @@
       <workItem from="1737984123705" duration="5824000" />
       <workItem from="1739292111903" duration="724000" />
       <workItem from="1739340770547" duration="2094000" />
+      <workItem from="1739350396880" duration="1578000" />
+      <workItem from="1739358959085" duration="6956000" />
     </task>
     <servers />
   </component>

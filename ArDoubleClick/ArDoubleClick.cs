@@ -242,10 +242,9 @@ public static class ArDoubleClick
             {
                 // 判斷是否是要處理的類型
                 string classType = ids[0].ObjectClass.DxfName;
-                if (!_voteCommand.TryGetValue(classType, out string? value))
+                if (!_voteCommand.TryGetValue(classType, out string? cmd))
                     return;
 
-                string cmd = value + " ";
                 if (string.IsNullOrWhiteSpace(cmd))
                     return;
 
@@ -254,17 +253,16 @@ public static class ArDoubleClick
                 Editor.WriteMessage($"\n快捷面板命令：{ids[0].ObjectClass.DxfName}");
                 Editor.WriteMessage($"\nDm_VetoCommand {e.GlobalCommandName} 被否决了");
 #endif
-                Document.SendStringToExecute(cmd, true, false, false);
+                Document.SendStringToExecute(cmd + " ", true, false, false);
             }
             else
             {
                 if (CmdClassMap.ContainsKey(e.GlobalCommandName.ToUpper())) // 判斷多選是非矩形視口
                 {
                     var classType = CmdClassMap[e.GlobalCommandName.ToUpper()];
-                    if (!_voteCommand.TryGetValue(classType, out string? value))
+                    if (!_voteCommand.TryGetValue(classType, out string? cmd))
                         return;
 
-                    var cmd = value + " ";
                     if (string.IsNullOrWhiteSpace(cmd))
                         return;
 
@@ -273,7 +271,7 @@ public static class ArDoubleClick
                     Editor.WriteMessage($"\n快捷面板命令：{ids[0].ObjectClass.DxfName}");
                     Editor.WriteMessage($"\nDm_VetoCommand {e.GlobalCommandName} 被否决了");
 #endif
-                    Document.SendStringToExecute(cmd, true, false, false);
+                    Document.SendStringToExecute(cmd + " ", true, false, false);
                 }
                 else
                 {
@@ -282,8 +280,8 @@ public static class ArDoubleClick
                     Editor.WriteMessage($"\nDm_VetoCommand {e.GlobalCommandName} 被否决了");
                     Editor.WriteMessage($"\n多選了對象");
 #endif
-                    string cmd = _multiSelectCmd + " ";
-                    Document.SendStringToExecute(cmd, true, false, false);
+                    const string cmd = nameof(DoubleClickIsMultiSelect);
+                    Document.SendStringToExecute(cmd + " ", true, false, false);
                 }
             }
         }
@@ -307,7 +305,7 @@ public static class ArDoubleClick
         if (Database.TileMode)
         {
             if (!string.IsNullOrWhiteSpace(_isQuiescentCommand[0]))
-                Document.SendStringToExecute($"\u0003_{_isQuiescentCommand[0]} ", true, false, false);
+                Document.SendStringToExecute(_isQuiescentCommand[0] + " ", true, false, false);
         }
         else
         {
@@ -376,11 +374,65 @@ public static class ArDoubleClick
             tr.Commit();
 
             // 發送相應的命令
-            var cmd = (vpActive.Number == 1 ? _isQuiescentCommand[1] : _isQuiescentCommand[2]) + " ";
+            var cmd = vpActive.Number == 1 ? _isQuiescentCommand[1] : _isQuiescentCommand[2];
             if (!isMsClick && !string.IsNullOrWhiteSpace(cmd))
-                Document.SendStringToExecute(cmd, true, false, false);
+                Document.SendStringToExecute(cmd + " ", true, false, false);
         }
 
         //_isCurrent = int.MaxValue; // 重置
+    }
+
+    [CommandMethod(nameof(DoubleClickIsMultiSelect), CommandFlags.UsePickSet | CommandFlags.NoHistory)]
+    public static void DoubleClickIsMultiSelect()
+    {
+        string cmd = _multiSelectCmd;
+        // 判斷是否選中對象
+        var ppr = Editor.SelectImplied();
+        if (ppr.Status != PromptStatus.OK)
+            return;
+        var ids = ppr.Value.GetObjectIds();
+
+        // 判斷選擇是否包含了單個視口
+        if (ids.Length == 2)
+            cmd = GetCmdByObjectType(ids, nameof(Viewport), cmd);
+        // 判斷選擇是否包含了單個填充
+        cmd = GetCmdByObjectType(ids, nameof(Hatch), cmd);
+        // todo:2025-02-12  其它特殊的多選對象觸發的邏輯(待整理)
+
+        Editor.Command(cmd); // 必須同步發送命令方式，不可使用SendStringToExecute異步命令方式，否則之前過濾出的id不會立即生效。
+    }
+
+    /// <summary>
+    /// 根據選中的對象類型，返回相應的命令。
+    /// </summary>
+    /// <param name="ids">選中的對象ID集合。</param>
+    /// <param name="type">需要判斷的對象類型。</param>
+    /// <param name="cmd">默認命令。</param>
+    /// <returns>根據對象類型返回相應的命令，如果沒有匹配則返回默認命令。</returns>
+    private static string GetCmdByObjectType(IEnumerable<ObjectId> ids, string type, string cmd)
+    {
+        // 判斷是否選擇了單個視口
+        int countNum = 0;
+        ObjectId typeId = ObjectId.Null;
+        foreach (var id in ids)
+        {
+            if (!id.ObjectClass.DxfName.Equals(type, StringComparison.CurrentCultureIgnoreCase))
+                continue;
+
+            typeId = id;
+            countNum++;
+        }
+
+        // 發送單個視口相應的命令
+        if (countNum != 1)
+            return cmd;
+
+        // 選中需要執行命令的typeId
+        Editor.SetImpliedSelection([]);
+        Editor.SetImpliedSelection([typeId]);
+        string classType = type.ToUpper();
+        if (_voteCommand.TryGetValue(classType, out string? value))
+            cmd = value;
+        return cmd;
     }
 }

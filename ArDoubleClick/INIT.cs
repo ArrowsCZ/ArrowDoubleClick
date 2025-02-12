@@ -32,9 +32,12 @@ public class Init : IExtensionApplication
         // Bug修復:2025-01-22  開啟、關閉文檔事件改為激活文檔事件，這樣更加方便用戶操作
         // Acaop.DocumentManager.DocumentCreated += DmClickStart; // 開啟文檔時，加載雙擊事件
         // Acaop.DocumentManager.DocumentDestroyed += DmClickEnd; // 關閉文檔時，移除雙擊事件
-        Acaop.DocumentManager.DocumentActivated += DmClickActivated; // 切換文檔時，加載雙擊事件
-        // 加载dll首个文档直接加载双击操作
-        ArDoubleClick.ArDoubleClickStart();
+
+        // Bug修復:2025-02-12  加载dll首个文档直接加载双击操作
+        {
+            Acaop.DocumentManager.DocumentActivated += DmClickActivated; // 切換文檔時，加載雙擊事件
+            ArDoubleClick.ArDoubleClickStart();
+        }
     }
 
     /// <summary>
