@@ -17,7 +17,7 @@ public static class ArrowTool
         var url = new UriBuilder(assemblyPath);
         assemblyPath = Uri.UnescapeDataString(url.Path);
 
-        return Path.GetFullPath(assemblyPath); // 这里是\\
+        return Path.GetFullPath(assemblyPath);
     }
 
     /// <summary>

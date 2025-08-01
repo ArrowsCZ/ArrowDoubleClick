@@ -20,8 +20,8 @@
     <Command Type="ELLIPSE">Circle</Command>
     <!--注释类-->
     <Command Type="HATCH">Circle</Command>
-    <Command Type="TEXT">Circle</Command>
-    <Command Type="MTEXT">Circle</Command>
+    <Command Type="TEXT">TEXTEDIT</Command>
+    <Command Type="MTEXT">TEXTEDIT</Command>
     <Command Type="DIMENSION">Circle</Command>
     <Command Type="LEADER">Circle</Command>
     <Command Type="MULTILEADER">Circle</Command>
